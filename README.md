@@ -21,7 +21,9 @@ npm start
 
 ## Déploiement
 
-L'application est déployée sur AWS S3 avec CloudFront. Pour déployer :
+### Déploiement Manuel
+
+L'application peut être déployée manuellement sur AWS S3 avec CloudFront :
 
 1. Construire l'application :
 ```bash
@@ -38,11 +40,36 @@ npm run deploy
 npm run invalidate
 ```
 
+### Déploiement Automatique avec AWS CodeBuild
+
+Le projet est configuré pour être déployé automatiquement via AWS CodeBuild. Le processus de déploiement est défini dans le fichier `buildspec.yml`.
+
+Pour configurer le déploiement automatique :
+
+1. Créer un projet CodeBuild dans AWS Console
+2. Configurer les variables d'environnement :
+   - `S3_BUCKET` : Le nom de votre bucket S3
+   - `CLOUDFRONT_DISTRIBUTION_ID` : L'ID de votre distribution CloudFront
+3. Connecter le projet à votre repository GitHub
+4. Configurer les déclencheurs de build (par exemple, à chaque push sur la branche main)
+
+Le pipeline de déploiement effectuera automatiquement :
+- Installation des dépendances
+- Build de l'application
+- Déploiement sur S3
+- Invalidation du cache CloudFront
+
 ## Configuration AWS
 
-Avant de déployer, configurez les variables suivantes dans package.json :
+### Configuration Manuel
+Avant de déployer manuellement, configurez les variables suivantes dans package.json :
 - `your-bucket-name` : Le nom de votre bucket S3
 - `YOUR_DISTRIBUTION_ID` : L'ID de votre distribution CloudFront
+
+### Configuration CodeBuild
+Dans la console AWS CodeBuild, configurez les variables d'environnement :
+- `S3_BUCKET` : Le nom de votre bucket S3
+- `CLOUDFRONT_DISTRIBUTION_ID` : L'ID de votre distribution CloudFront
 
 ## Technologies utilisées
 
@@ -50,4 +77,5 @@ Avant de déployer, configurez les variables suivantes dans package.json :
 - TypeScript
 - AWS S3
 - AWS CloudFront
+- AWS CodeBuild
 - ChatGPT API (pour la transformation d'images)
