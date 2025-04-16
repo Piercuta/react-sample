@@ -1,46 +1,53 @@
-# Getting Started with Create React App
+# Image Transformation App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Une application React pour transformer vos images en œuvres d'art grâce à l'IA.
 
-## Available Scripts
+## Fonctionnalités
 
-In the project directory, you can run:
+- Upload d'images avec prévisualisation
+- Transformation d'images en œuvres d'art
+- Interface utilisateur moderne et responsive
+- Téléchargement et partage des images transformées
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+# Installer les dépendances
+npm install
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+# Lancer l'application en mode développement
+npm start
+```
 
-### `npm test`
+## Déploiement
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+L'application est déployée sur AWS S3 avec CloudFront. Pour déployer :
 
-### `npm run build`
+1. Construire l'application :
+```bash
+npm run build
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Déployer sur S3 :
+```bash
+npm run deploy
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Invalider le cache CloudFront :
+```bash
+npm run invalidate
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Configuration AWS
 
-### `npm run eject`
+Avant de déployer, configurez les variables suivantes dans package.json :
+- `your-bucket-name` : Le nom de votre bucket S3
+- `YOUR_DISTRIBUTION_ID` : L'ID de votre distribution CloudFront
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Technologies utilisées
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- React
+- TypeScript
+- AWS S3
+- AWS CloudFront
+- ChatGPT API (pour la transformation d'images)
