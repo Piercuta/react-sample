@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+interface ApiResponse {
+  success: boolean;
+  imageUrl?: string;
+  error?: string;
+}
+
 function App() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -26,22 +32,49 @@ function App() {
   };
 
   const handleUpload = async () => {
-    if (selectedImage) {
-      setIsProcessing(true);
-      setError('');
-      
-      try {
-        // Simulation du traitement (à remplacer par l'appel à votre API)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Pour l'instant, on utilise la même image comme résultat
-        // À remplacer par l'URL de l'image transformée de votre API
-        setArtisticImage(previewUrl);
-      } catch (err) {
-        setError('Une erreur est survenue lors du traitement de l\'image');
-      } finally {
-        setIsProcessing(false);
+    if (!selectedImage) return;
+    
+    setIsProcessing(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/resize-image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data: ApiResponse = await response.json();
+
+      if (data.success && data.imageUrl) {
+        setArtisticImage(data.imageUrl);
+      } else {
+        throw new Error(data.error || 'Erreur lors de la transformation de l\'image');
+      }
+    } catch (err) {
+      console.error('Erreur lors de l\'upload:', err);
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors du traitement de l\'image');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDownload = () => {
+    if (artisticImage) {
+      window.open(artisticImage, '_blank');
+    }
+  };
+
+  const handleShare = () => {
+    if (artisticImage) {
+      // Implémenter la logique de partage ici
+      console.log('Partager l\'image:', artisticImage);
     }
   };
 
@@ -98,8 +131,8 @@ function App() {
                 <img src={artisticImage} alt="Artistic version" className="preview-image" />
               </div>
               <div className="action-buttons">
-                <button className="download-button">Télécharger</button>
-                <button className="share-button">Partager</button>
+                <button className="download-button" onClick={handleDownload}>Télécharger</button>
+                <button className="share-button" onClick={handleShare}>Partager</button>
               </div>
             </div>
           )}
