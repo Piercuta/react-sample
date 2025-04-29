@@ -38,12 +38,26 @@ function App() {
     setError('');
     
     try {
-      const formData = new FormData();
-      formData.append('image', selectedImage);
+      // Convertir l'image en base64
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(selectedImage);
+        reader.onload = () => {
+          // On extrait la partie base64 en enlevant le préfixe (data:image/jpeg;base64,)
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = (error) => reject(error);
+      });
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/resize-image`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: base64Image
+        }),
       });
 
       if (!response.ok) {
