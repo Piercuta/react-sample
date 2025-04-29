@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 interface ApiResponse {
-  success: boolean;
-  imageUrl?: string;
-  error?: string;
+  message: string;
+  imageUrl: string;
 }
 
 function App() {
@@ -38,26 +37,12 @@ function App() {
     setError('');
     
     try {
-      // Convertir l'image en base64
-      const base64Image = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(selectedImage);
-        reader.onload = () => {
-          // On extrait la partie base64 en enlevant le préfixe (data:image/jpeg;base64,)
-          const base64 = (reader.result as string).split(',')[1];
-          resolve(base64);
-        };
-        reader.onerror = (error) => reject(error);
-      });
+      const formData = new FormData();
+      formData.append('image', selectedImage);
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/resize-image`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          image: base64Image
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -65,11 +50,12 @@ function App() {
       }
 
       const data: ApiResponse = await response.json();
+      console.log('Réponse de l\'API:', data);
 
-      if (data.success && data.imageUrl) {
+      if (data.imageUrl) {
         setArtisticImage(data.imageUrl);
       } else {
-        throw new Error(data.error || 'Erreur lors de la transformation de l\'image');
+        throw new Error('URL de l\'image non reçue dans la réponse');
       }
     } catch (err) {
       console.error('Erreur lors de l\'upload:', err);
