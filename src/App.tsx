@@ -45,17 +45,26 @@ function App() {
         body: formData,
       });
 
+      // Afficher la réponse brute
+      const responseText = await response.text();
+      console.log('Réponse brute:', responseText);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}\nRéponse: ${responseText}`);
       }
 
-      const data: ApiResponse = await response.json();
-      console.log('Réponse de l\'API:', data);
+      try {
+        const data: ApiResponse = JSON.parse(responseText);
+        console.log('Réponse parsée:', data);
 
-      if (data.imageUrl) {
-        setArtisticImage(data.imageUrl);
-      } else {
-        throw new Error('URL de l\'image non reçue dans la réponse');
+        if (data.imageUrl) {
+          setArtisticImage(data.imageUrl);
+        } else {
+          throw new Error('URL de l\'image non reçue dans la réponse');
+        }
+      } catch (parseError: unknown) {
+        console.error('Erreur de parsing JSON:', parseError);
+        throw new Error(`Erreur lors du parsing de la réponse: ${parseError instanceof Error ? parseError.message : String(parseError)}\nRéponse brute: ${responseText}`);
       }
     } catch (err) {
       console.error('Erreur lors de l\'upload:', err);
