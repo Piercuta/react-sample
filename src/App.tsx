@@ -22,6 +22,19 @@ function App() {
     setArtisticImage('');
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
+      
+      // Vérifier la taille du fichier (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('L\'image ne doit pas dépasser 5MB');
+        return;
+      }
+      
+      // Vérifier le type de fichier
+      if (!file.type.startsWith('image/')) {
+        setError('Veuillez sélectionner une image valide');
+        return;
+      }
+      
       setSelectedImage(file);
       
       // Créer l'URL de prévisualisation
@@ -37,15 +50,28 @@ function App() {
     setError('');
     
     try {
-      const formData = new FormData();
-      formData.append('image', selectedImage);
+      // Convertir l'image en base64
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(selectedImage);
+        reader.onload = () => {
+          // On extrait la partie base64 en enlevant le préfixe (data:image/jpeg;base64,)
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = (error) => reject(error);
+      });
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/resize-image`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: base64Image
+        }),
       });
 
-      // Afficher la réponse brute
       const responseText = await response.text();
       console.log('Réponse brute:', responseText);
 
