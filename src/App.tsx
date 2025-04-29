@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -7,6 +7,10 @@ function App() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [artisticImage, setArtisticImage] = useState<string>('');
   const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    console.log('API URL:', process.env.REACT_APP_API_URL);
+  }, []);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError('');
